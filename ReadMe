@@ -15,6 +15,7 @@ CompileDaemon -command="./projectName"
 
 Have used prepared statements
 
+example:-
 stmt, err := db.Prepare("SELECT \* FROM album WHERE id = ?")
 if err != nil {
 log.Fatal(err)
