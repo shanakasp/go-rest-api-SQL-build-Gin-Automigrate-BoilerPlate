@@ -32,7 +32,7 @@ func main() {
 	router.POST("/users", createUser) // POST /users
 	router.GET("/user/:id", getUser)   // GET /users/:id
 	router.GET("/users", getUsers)     // GET /users
-	// router.PUT("/users/:id", updateUser) // PUT /users/:id
+	router.PUT("/user/:id", updateUser) // PUT /users/:id
 	// router.DELETE("/users/:id", deleteUser) // DELETE /users/:id
 	
 	router.Run(":8080")
@@ -133,38 +133,33 @@ func getUser(c *gin.Context){
 	c.JSON(http.StatusOK, user)
 }
 
-// func updateUser(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "application/json")
-// 	params := mux.Vars(r)
+func updateUser(c *gin.Context) {
+	id := c.Param("id")
 
-// 	stmt, err := db.Prepare("UPDATE users SET name = ? WHERE id = ?")
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-// 	defer stmt.Close()
+	var body struct {
+		Name string `json:"name"`
+	}
 
-// 	body, err := io.ReadAll(r.Body)
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-// 	defer r.Body.Close()
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-// 	var user User
-// 	if err := json.Unmarshal(body, &user); err != nil {
-// 		http.Error(w, err.Error(), http.StatusBadRequest)
-// 		return
-// 	}
+	stmt, err := db.Prepare("UPDATE userss SET name = ? WHERE id = ? AND deleted_at IS NULL")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer stmt.Close()
 
-// 	_, err = stmt.Exec(user.Name, params["id"])
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
+	_, err = stmt.Exec(body.Name, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
-// 	fmt.Fprintf(w, "User with ID = %s was updated", params["id"])
-// }
+	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("User with ID = %s was updated", id)})
+}
 
 // func deleteUser(w http.ResponseWriter, r *http.Request) {
 // 	w.Header().Set("Content-Type", "application/json")
