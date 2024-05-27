@@ -84,21 +84,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/users/:{id}",
+					"raw": "http://localhost:8080/user/1",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
-						"users",
-						":{id}"
-					],
-					"variable": [
-						{
-							"key": "{id}",
-							"value": "User 123"
-						}
+						"user",
+						"1"
 					]
 				}
 			},
@@ -106,6 +100,37 @@
 		},
 		{
 			"name": "Get All Users",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"User ABC\"\r\n    \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get User by ID",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},

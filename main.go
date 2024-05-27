@@ -33,7 +33,7 @@ func main() {
 	router.GET("/user/:id", getUser)   // GET /users/:id
 	router.GET("/users", getUsers)     // GET /users
 	router.PUT("/user/:id", updateUser) // PUT /users/:id
-	// router.DELETE("/users/:id", deleteUser) // DELETE /users/:id
+	router.DELETE("/users/:id", deleteUser) // DELETE /users/:id
 	
 	router.Run(":8080")
 }
@@ -161,22 +161,20 @@ func updateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("User with ID = %s was updated", id)})
 }
 
-// func deleteUser(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "application/json")
-// 	params := mux.Vars(r)
+func deleteUser(c*gin.Context) {
+id:= c.Param("id")
 
-// 	stmt, err := db.Prepare("DELETE FROM users WHERE id = ?")
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-// 	defer stmt.Close()
+stmt, err := db.Prepare("DELETE FROM userss WHERE id = ?")
+if err != nil {
+    c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+    return
+}
+defer stmt.Close()
 
-// 	_, err = stmt.Exec(params["id"])
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	fmt.Fprintf(w, "User with ID = %s was deleted", params["id"])
-// }
+_, err = stmt.Exec(id)
+if err != nil {
+    c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+    return
+}
+c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("User with ID = %s was deleted", id)})
+}
