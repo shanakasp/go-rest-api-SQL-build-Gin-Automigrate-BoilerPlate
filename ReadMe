@@ -12,3 +12,12 @@ go get -u github.com/go-sql-driver/mysql
 Created main.go file
 
 CompileDaemon -command="./projectName"
+
+Have used prepared statements
+
+stmt, err := db.Prepare("SELECT \* FROM album WHERE id = ?")
+if err != nil {
+log.Fatal(err)
+}
+
+https://go.dev/doc/database/prepared-statements
