@@ -30,7 +30,7 @@ func main() {
 	router := gin.Default()
 
 	router.POST("/users", createUser) // POST /users
-	// router.GET("/users/:id", getUser)   // GET /users/:id
+	router.GET("/user/:id", getUser)   // GET /users/:id
 	router.GET("/users", getUsers)     // GET /users
 	// router.PUT("/users/:id", updateUser) // PUT /users/:id
 	// router.DELETE("/users/:id", deleteUser) // DELETE /users/:id
@@ -112,29 +112,26 @@ func getUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, users)
 }
 
-// func getUser(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "application/json")
-// 	params := mux.Vars(r)
+func getUser(c *gin.Context){
+	c.Header("Content-Type", "application/json")
 
-// 	stmt, err := db.Prepare("SELECT id, name FROM users WHERE id = ?")
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-// 	defer stmt.Close()
+	id := c.Param("id")
 
-// 	var user User
-// 	if err := stmt.QueryRow(params["id"]).Scan(&user.ID, &user.Name); err != nil {
-// 		if err == sql.ErrNoRows {
-// 			http.Error(w, "User not found", http.StatusNotFound)
-// 		} else {
-// 			http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		}
-// 		return
-// 	}
+	row := db.QueryRow("SELECT id, name FROM userss WHERE id = ?", id)
 
-// 	json.NewEncoder(w).Encode(user)
-// }
+	var user User
+	if err := row.Scan(&user.ID, &user.Name); err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		
+	    return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
 
 // func updateUser(w http.ResponseWriter, r *http.Request) {
 // 	w.Header().Set("Content-Type", "application/json")
